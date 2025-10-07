@@ -11,6 +11,7 @@
     height: 100%;
     overflow: hidden;
     font-family: "Noto Sans TC", sans-serif;
+    background-color: #000; /* 防止露出白底 */
   }
 
   body {
@@ -19,14 +20,15 @@
 
   #background {
     position: fixed;
-    top: 0;
-    left: -80;
-    width: 130%; /* 稍微大一點方便漂浮效果 */
-    height: 130%;
-    background: url('background.jpg') no-repeat bottom center;
+    top: 50%;
+    left: 50%;
+    width: 150%; /* 放大避免邊緣露白 */
+    height: 150%;
+    background: url('background.jpg') no-repeat center center;
     background-size: cover;
-    filter: blur(8px); /* 模糊效果 */
-    transform: translate(-5%, -5%) rotateX(0deg) rotateY(0deg);
+    filter: blur(8px);
+    transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
+    transform-origin: center center; /* 旋轉中心設定在中間 */
     transition: transform 0.1s ease-out;
     z-index: -1;
   }
@@ -65,10 +67,9 @@
 const bg = document.getElementById('background');
 
 document.addEventListener('mousemove', (e) => {
-  // 計算滑鼠位置（比例值）
-  const x = (e.clientX / window.innerWidth - 0.5) * 20; // 左右傾斜
-  const y = (e.clientY / window.innerHeight - 0.5) * 20; // 上下傾斜
-  bg.style.transform = `translate(-5%, -5%) rotateX(${-y}deg) rotateY(${x}deg)`;
+  const x = (e.clientX / window.innerWidth - 0.5) * 20;
+  const y = (e.clientY / window.innerHeight - 0.5) * 20;
+  bg.style.transform = `translate(-50%, -50%) rotateX(${-y}deg) rotateY(${x}deg)`;
 });
 </script>
 </body>
