@@ -11,26 +11,49 @@
     height: 100%;
     overflow: hidden;
     font-family: "Noto Sans TC", sans-serif;
-    background-color: #000; /* 防止露出白底 */
+    background-color: #000;
   }
 
   body {
-    perspective: 1000px; /* 3D 旋轉效果 */
+    perspective: 1000px;
   }
 
   #background {
     position: fixed;
     top: 50%;
     left: 50%;
-    width: 150%; /* 放大避免邊緣露白 */
+    width: 150%;
     height: 150%;
     background: url('background.jpg') no-repeat center center;
     background-size: cover;
     filter: blur(8px);
     transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
-    transform-origin: center center; /* 旋轉中心設定在中間 */
+    transform-origin: center center;
     transition: transform 0.1s ease-out;
+    z-index: -2;
+  }
+
+  #fog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.2), rgba(255,255,255,0) 60%);
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
     z-index: -1;
+  }
+
+  .dot {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
   }
 
   .content {
@@ -57,19 +80,51 @@
 </head>
 <body>
 <div id="background"></div>
-
+<div id="fog"></div>
 <div class="content">
   <h1>🌙 歡迎來到 Kabu 的小世界</h1>
-  <p>鼠標移動，背景會微微動起來喔～</p>
+  <p>滑鼠移到邊緣會出現淡淡的白霧與白點喔～</p>
 </div>
 
 <script>
 const bg = document.getElementById('background');
+const fog = document.getElementById('fog');
+const dots = [];
+
+// 建立隨機白點
+for (let i = 0; i < 30; i++) {
+  const dot = document.createElement('div');
+  dot.classList.add('dot');
+  dot.style.left = Math.random() * 100 + '%';
+  dot.style.top = Math.random() * 100 + '%';
+  document.body.appendChild(dot);
+  dots.push(dot);
+}
 
 document.addEventListener('mousemove', (e) => {
-  const x = (e.clientX / window.innerWidth - 0.5) * 20;
-  const y = (e.clientY / window.innerHeight - 0.5) * 20;
+  const xRatio = e.clientX / window.innerWidth;
+  const yRatio = e.clientY / window.innerHeight;
+  const x = (xRatio - 0.5) * 20;
+  const y = (yRatio - 0.5) * 20;
   bg.style.transform = `translate(-50%, -50%) rotateX(${-y}deg) rotateY(${x}deg)`;
+
+  // 更新霧的位置
+  fog.style.setProperty('--x', `${xRatio * 100}%`);
+  fog.style.setProperty('--y', `${yRatio * 100}%`);
+
+  // 邊緣才出現霧
+  const edgeThreshold = 0.2;
+  const nearEdge = (xRatio < edgeThreshold || xRatio > 1 - edgeThreshold || yRatio < edgeThreshold || yRatio > 1 - edgeThreshold);
+  fog.style.opacity = nearEdge ? 1 : 0;
+
+  // 白點閃爍
+  dots.forEach(dot => {
+    if (nearEdge && Math.random() < 0.1) {
+      dot.style.opacity = 0.6;
+      dot.style.transform = `scale(${1 + Math.random() * 1.5})`;
+      setTimeout(() => { dot.style.opacity = 0; }, 300);
+    }
+  });
 });
 </script>
 </body>
