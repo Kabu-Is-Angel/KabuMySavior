@@ -1,38 +1,75 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kabu 的小世界</title>
-  <style>
-    body {
-      background-color: #0a0a0a;
-      color: #f5f5f5;
-      font-family: "Noto Sans TC", sans-serif;
-      text-align: center;
-      padding-top: 100px;
-    }
-    h1 {
-      font-size: 2.5em;
-      color: #ffb6c1;
-    }
-    p {
-      font-size: 1.2em;
-      color: #aaa;
-    }
-    .shine {
-      color: #aaf;
-      animation: glow 2s infinite alternate;
-    }
-    @keyframes glow {
-      from { text-shadow: 0 0 10px #aaf; }
-      to { text-shadow: 0 0 30px #fff; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kabu 的小世界</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: "Noto Sans TC", sans-serif;
+  }
+
+  body {
+    perspective: 1000px; /* 3D 旋轉效果 */
+  }
+
+  #background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 110%; /* 稍微大一點方便漂浮效果 */
+    height: 110%;
+    background: url('你的圖片網址.jpg') no-repeat center center;
+    background-size: cover;
+    filter: blur(10px); /* 模糊效果 */
+    transform: translate(-5%, -5%) rotateX(0deg) rotateY(0deg);
+    transition: transform 0.1s ease-out;
+    z-index: -1;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    color: #fff;
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  h1 {
+    font-size: 3em;
+    color: #ffb6c1;
+    text-shadow: 0 0 20px #ffb6c1;
+  }
+
+  p {
+    font-size: 1.2em;
+    color: #ccc;
+    text-shadow: 0 0 10px #aaa;
+  }
+</style>
 </head>
 <body>
+<div id="background"></div>
+
+<div class="content">
   <h1>🌙 歡迎來到 Kabu 的小世界</h1>
-  <p class="shine">這裡是我的空間，一個寧靜又神秘的角落。</p>
-  <p>（網站建構中...）</p>
+  <p>鼠標移動，背景會微微動起來喔～</p>
+</div>
+
+<script>
+const bg = document.getElementById('background');
+
+document.addEventListener('mousemove', (e) => {
+  // 計算滑鼠位置（比例值）
+  const x = (e.clientX / window.innerWidth - 0.5) * 20; // 左右傾斜
+  const y = (e.clientY / window.innerHeight - 0.5) * 20; // 上下傾斜
+  bg.style.transform = `translate(-5%, -5%) rotateX(${-y}deg) rotateY(${x}deg)`;
+});
+</script>
 </body>
 </html>
