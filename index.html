@@ -30,7 +30,7 @@
     transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
     transform-origin: center center;
     transition: transform 0.1s ease-out;
-    z-index: -2;
+    z-index: -3;
   }
 
   #fog {
@@ -43,7 +43,7 @@
     background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,var(--intensity,0.2)), rgba(255,255,255,0) 60%);
     opacity: 0;
     transition: opacity 0.3s ease-out;
-    z-index: -1;
+    z-index: -2;
   }
 
   .dot {
@@ -54,6 +54,16 @@
     border-radius: 50%;
     opacity: 0;
     transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  }
+
+  .meteor {
+    position: absolute;
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0));
+    border-radius: 50%;
+    opacity: 0;
+    z-index: -1;
   }
 
   .content {
@@ -83,7 +93,7 @@
 <div id="fog"></div>
 <div class="content">
   <h1>🌙 歡迎來到 Kabu 的小世界</h1>
-  <p>滑鼠移到邊緣會出現漸變白霧與閃爍白點喔～</p>
+  <p>滑鼠移到邊緣會出現漸變白霧與閃爍白點，不靠邊時有流星滑落喔～</p>
 </div>
 
 <script>
@@ -91,7 +101,6 @@ const bg = document.getElementById('background');
 const fog = document.getElementById('fog');
 const dots = [];
 
-// 建立隨機白點
 for (let i = 0; i < 30; i++) {
   const dot = document.createElement('div');
   dot.classList.add('dot');
@@ -101,6 +110,29 @@ for (let i = 0; i < 30; i++) {
   dots.push(dot);
 }
 
+function createMeteor() {
+  const meteor = document.createElement('div');
+  meteor.classList.add('meteor');
+  meteor.style.left = Math.random() * window.innerWidth + 'px';
+  meteor.style.top = '-50px';
+  meteor.style.opacity = '1';
+  document.body.appendChild(meteor);
+
+  const duration = 2000 + Math.random() * 1000;
+  const endY = window.innerHeight + 100;
+
+  meteor.animate([
+    { transform: 'translateY(0)', opacity: 1 },
+    { transform: `translateY(${endY}px)`, opacity: 0 }
+  ], {
+    duration,
+    easing: 'ease-in',
+    fill: 'forwards'
+  });
+
+  setTimeout(() => meteor.remove(), duration);
+}
+
 document.addEventListener('mousemove', (e) => {
   const xRatio = e.clientX / window.innerWidth;
   const yRatio = e.clientY / window.innerHeight;
@@ -108,19 +140,14 @@ document.addEventListener('mousemove', (e) => {
   const y = (yRatio - 0.5) * 20;
   bg.style.transform = `translate(-50%, -50%) rotateX(${-y}deg) rotateY(${x}deg)`;
 
-  // 計算與邊緣的距離比例
   const edgeDistance = Math.min(xRatio, 1 - xRatio, yRatio, 1 - yRatio);
-  const intensity = Math.max(0, 1 - edgeDistance * 5); // 越靠近邊緣越亮
+  const intensity = Math.max(0, 1 - edgeDistance * 5);
 
-  // 更新霧位置與強度
   fog.style.setProperty('--x', `${xRatio * 100}%`);
   fog.style.setProperty('--y', `${yRatio * 100}%`);
   fog.style.setProperty('--intensity', intensity.toFixed(2));
-
-  // 若靠近邊緣則顯示霧
   fog.style.opacity = intensity > 0.1 ? 1 : 0;
 
-  // 白點閃爍
   dots.forEach(dot => {
     if (intensity > 0.5 && Math.random() < 0.1) {
       dot.style.opacity = 0.6;
@@ -128,6 +155,11 @@ document.addEventListener('mousemove', (e) => {
       setTimeout(() => { dot.style.opacity = 0; }, 300);
     }
   });
+
+  // 流星出現條件：不靠邊緣時才有
+  if (intensity < 0.1 && Math.random() < 0.05) {
+    createMeteor();
+  }
 });
 </script>
 </body>
