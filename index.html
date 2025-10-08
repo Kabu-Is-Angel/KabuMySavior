@@ -35,7 +35,7 @@
     filter: blur(8px);
     transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
     transform-origin: center center;
-    transition: transform 0.1s ease-out, opacity 1s ease, background-image 1s ease, background-color 1s ease;
+    transition: transform 0.1s ease-out, opacity 1s ease, background 1s ease;
     z-index: -3;
   }
 
@@ -203,20 +203,17 @@ function showPage(index) {
   currentPage = index;
 
   if (currentPage === 0) {
-    bg.style.transition = 'transform 0.1s ease-out, opacity 1s ease, background-image 1s ease, background-color 1s ease';
     bg.style.background = "url('background.jpg') no-repeat center center";
     bg.style.backgroundSize = 'cover';
     fog.style.display = 'block';
     startSnow();
   } else if (currentPage === 1) {
-    bg.style.transition = 'transform 0.1s ease-out, opacity 1s ease, background-image 1.5s ease, background-color 1.5s ease';
     bg.style.background = "url('second_page.jpg') no-repeat center center";
     bg.style.backgroundSize = 'cover';
     fog.style.display = 'none';
     stopSnow();
     bg.style.transform = 'translate(-50%, -50%) rotateX(0deg) rotateY(0deg)';
   } else if (currentPage === 2) {
-    bg.style.transition = 'transform 0.1s ease-out, opacity 1s ease, background-image 1.5s ease, background-color 1.5s ease';
     bg.style.background = '#333';
     fog.style.display = 'none';
     stopSnow();
