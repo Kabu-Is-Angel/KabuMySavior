@@ -58,13 +58,26 @@
 
   .meteor {
     position: absolute;
-    width: 2px;
-    height: 60px;
-    background: linear-gradient(45deg, rgba(255,255,255,0.9), rgba(255,255,255,0));
-    border-radius: 2px;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255,255,255,0.8);
     transform: rotate(45deg);
     opacity: 0;
-    z-index: -1;
+  }
+
+  .meteor::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.8), rgba(255,255,255,0));
+    transform-origin: left center;
+    transform: translate(-50%, -50%) rotate(0deg);
+    border-radius: 2px;
   }
 
   .content {
@@ -94,7 +107,7 @@
 <div id="fog"></div>
 <div class="content">
   <h1>🌙 歡迎來到 Kabu 的小世界</h1>
-  <p>滑鼠移到邊緣會出現漸變白霧與閃爍白點，不靠邊時有流星滑落喔～</p>
+  <p>滑鼠在中心時會有流星劃過，邊緣則出現白霧～</p>
 </div>
 
 <script>
@@ -114,46 +127,30 @@ for (let i = 0; i < 30; i++) {
 function createMeteor() {
   const meteor = document.createElement('div');
   meteor.classList.add('meteor');
+
   const startX = Math.random() * window.innerWidth;
+  const startY = -50;
   meteor.style.left = `${startX}px`;
-  meteor.style.top = '-60px';
+  meteor.style.top = `${startY}px`;
   meteor.style.opacity = '1';
   document.body.appendChild(meteor);
 
-  const duration = 1500 + Math.random() * 500;
-  const endX = startX + 200 + Math.random() * 200;
-  const endY = window.innerHeight + 100;
-
-  const trail = document.createElement('div');
-  trail.classList.add('meteor');
-  trail.style.left = `${startX}px`;
-  trail.style.top = '-60px';
-  trail.style.opacity = '0.4';
-  trail.style.filter = 'blur(4px)';
-  document.body.appendChild(trail);
+  const duration = 1800 + Math.random() * 600;
+  const angle = 45 * Math.PI / 180;
+  const distance = window.innerHeight + 200;
+  const endX = startX + distance * Math.cos(angle);
+  const endY = startY + distance * Math.sin(angle);
 
   meteor.animate([
-    { transform: 'translate(0, 0)', opacity: 1 },
-    { transform: `translate(${endX - startX}px, ${endY}px)`, opacity: 0 }
+    { transform: `translate(0, 0) rotate(45deg)`, opacity: 1 },
+    { transform: `translate(${endX - startX}px, ${endY - startY}px) rotate(45deg)`, opacity: 0 }
   ], {
     duration,
     easing: 'ease-in',
     fill: 'forwards'
   });
 
-  trail.animate([
-    { transform: 'translate(0, 0)', opacity: 0.4 },
-    { transform: `translate(${endX - startX}px, ${endY}px)`, opacity: 0 }
-  ], {
-    duration: duration * 1.5,
-    easing: 'ease-out',
-    fill: 'forwards'
-  });
-
-  setTimeout(() => {
-    meteor.remove();
-    trail.remove();
-  }, duration * 1.5);
+  setTimeout(() => meteor.remove(), duration);
 }
 
 document.addEventListener('mousemove', (e) => {
@@ -179,8 +176,8 @@ document.addEventListener('mousemove', (e) => {
     }
   });
 
-  // 流星出現條件：不靠邊緣時才有
-  if (intensity < 0.1 && Math.random() < 0.2) {
+  // 滑鼠在中心時才生成流星
+  if (intensity < 0.1 && Math.random() < 0.3) {
     createMeteor();
   }
 });
