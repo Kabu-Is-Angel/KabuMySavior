@@ -73,14 +73,8 @@
   }
 
   @keyframes fall {
-    0% {
-      transform: translateY(0) rotate(0deg);
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(110vh) rotate(360deg);
-      opacity: 0;
-    }
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
   }
 
   .page {
@@ -143,7 +137,10 @@ const fog = document.getElementById('fog');
 const dots = [];
 let snowEnabled = true;
 let snowInterval;
+let currentPage = 0;
+let isScrolling = false;
 
+// 建立白點
 for (let i = 0; i < 30; i++) {
   const dot = document.createElement('div');
   dot.classList.add('dot');
@@ -165,17 +162,11 @@ function createSnowflake() {
   setTimeout(() => snowflake.remove(), 8000);
 }
 
-function startSnow() {
-  snowEnabled = true;
-  snowInterval = setInterval(createSnowflake, 300);
-}
-function stopSnow() {
-  snowEnabled = false;
-  clearInterval(snowInterval);
-}
+function startSnow() { snowEnabled = true; snowInterval = setInterval(createSnowflake, 300); }
+function stopSnow() { snowEnabled = false; clearInterval(snowInterval); }
 
+// 滑鼠移動控制白霧和雪花
 document.addEventListener('mousemove', (e) => {
-  if (currentPage !== 0) return;
   const xRatio = e.clientX / window.innerWidth;
   const yRatio = e.clientY / window.innerHeight;
   const x = (xRatio - 0.5) * 20;
@@ -185,21 +176,30 @@ document.addEventListener('mousemove', (e) => {
   const edgeDistance = Math.min(xRatio, 1 - xRatio, yRatio, 1 - yRatio);
   const intensity = Math.max(0, 1 - edgeDistance * 5);
 
-  fog.style.setProperty('--x', `${xRatio * 100}%`);
-  fog.style.setProperty('--y', `${yRatio * 100}%`);
-  fog.style.setProperty('--intensity', intensity.toFixed(2));
-  fog.style.opacity = intensity > 0.1 ? 1 : 0;
+  if (currentPage === 0) {
+    fog.style.setProperty('--x', `${xRatio * 100}%`);
+    fog.style.setProperty('--y', `${yRatio * 100}%`);
+    fog.style.setProperty('--intensity', intensity.toFixed(2));
+    fog.style.opacity = intensity > 0.1 ? 1 : 0;
+
+    // 控制雪花只在非邊緣出現
+    if (edgeDistance > 0.1 && !snowEnabled) startSnow();
+    if (edgeDistance <= 0.1 && snowEnabled) stopSnow();
+
+    // 白點閃爍始終存在
+    dots.forEach(dot => dot.style.opacity = 0.8);
+  } else {
+    fog.style.opacity = 0;
+    stopSnow();
+    dots.forEach(dot => dot.style.opacity = 0);
+  }
 });
 
-const pages = document.querySelectorAll('.page');
-let currentPage = 0;
-let isScrolling = false;
-
 function showPage(index) {
-  if (index < 0 || index >= pages.length || isScrolling) return;
+  if (index < 0 || index >= document.querySelectorAll('.page').length || isScrolling) return;
   isScrolling = true;
-  pages[currentPage].classList.remove('active');
-  pages[index].classList.add('active');
+  document.querySelectorAll('.page')[currentPage].classList.remove('active');
+  document.querySelectorAll('.page')[index].classList.add('active');
   currentPage = index;
 
   if (currentPage === 0) {
