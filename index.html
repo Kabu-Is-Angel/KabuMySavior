@@ -165,7 +165,14 @@ function createSnowflake() {
 function startSnow() { snowEnabled = true; snowInterval = setInterval(createSnowflake, 300); }
 function stopSnow() { snowEnabled = false; clearInterval(snowInterval); }
 
-// 滑鼠移動控制白霧和雪花
+// 白點閃爍效果
+function blinkDots() {
+  dots.forEach(dot => {
+    dot.style.opacity = Math.random() * 0.6 + 0.4;
+  });
+}
+
+// 滑鼠移動控制白霧、白點和雪花
 document.addEventListener('mousemove', (e) => {
   const xRatio = e.clientX / window.innerWidth;
   const yRatio = e.clientY / window.innerHeight;
@@ -182,12 +189,14 @@ document.addEventListener('mousemove', (e) => {
     fog.style.setProperty('--intensity', intensity.toFixed(2));
     fog.style.opacity = intensity > 0.1 ? 1 : 0;
 
-    // 控制雪花只在非邊緣出現
-    if (edgeDistance > 0.1 && !snowEnabled) startSnow();
-    if (edgeDistance <= 0.1 && snowEnabled) stopSnow();
-
-    // 白點閃爍始終存在
-    dots.forEach(dot => dot.style.opacity = 0.8);
+    if (intensity > 0.1) {
+      // 白點隨白霧閃爍
+      blinkDots();
+      stopSnow();
+    } else {
+      dots.forEach(dot => dot.style.opacity = 0);
+      startSnow();
+    }
   } else {
     fog.style.opacity = 0;
     stopSnow();
