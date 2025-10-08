@@ -59,7 +59,7 @@
     background: rgba(255,255,255,0.5);
     border-radius: 50%;
     opacity: 0;
-    transition: opacity 0.1s ease-out;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
   }
 
   .snowflake {
@@ -73,8 +73,14 @@
   }
 
   @keyframes fall {
-    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(110vh) rotate(360deg);
+      opacity: 0;
+    }
   }
 
   .page {
@@ -137,11 +143,7 @@ const fog = document.getElementById('fog');
 const dots = [];
 let snowEnabled = true;
 let snowInterval;
-let blinkInterval;
-let currentPage = 0;
-let isScrolling = false;
 
-// 建立白點
 for (let i = 0; i < 30; i++) {
   const dot = document.createElement('div');
   dot.classList.add('dot');
@@ -158,27 +160,22 @@ function createSnowflake() {
   snowflake.textContent = '❄';
   snowflake.style.left = Math.random() * window.innerWidth + 'px';
   snowflake.style.fontSize = 8 + Math.random() * 8 + 'px';
-  snowflake.style.animationDuration = 6 + Math.random() * 4 + 's';
+  snowflake.style.animationDuration = 4 + Math.random() * 3 + 's';
   document.body.appendChild(snowflake);
-  setTimeout(() => snowflake.remove(), 12000);
+  setTimeout(() => snowflake.remove(), 8000);
 }
 
-function startSnow() { snowEnabled = true; snowInterval = setInterval(createSnowflake, 1200); }
-function stopSnow() { snowEnabled = false; clearInterval(snowInterval); }
-
-// 白點閃爍效果
-function blinkDots() {
-  dots.forEach(dot => {
-    dot.style.opacity = Math.random() > 0.5 ? 1 : 0;
-  });
+function startSnow() {
+  snowEnabled = true;
+  snowInterval = setInterval(createSnowflake, 300);
+}
+function stopSnow() {
+  snowEnabled = false;
+  clearInterval(snowInterval);
 }
 
-// 控制白點閃爍
-function startBlinking() { blinkInterval = setInterval(blinkDots, 300); }
-function stopBlinking() { clearInterval(blinkInterval); dots.forEach(dot => dot.style.opacity = 0); }
-
-// 滑鼠移動控制白霧、白點和雪花
 document.addEventListener('mousemove', (e) => {
+  if (currentPage !== 0) return;
   const xRatio = e.clientX / window.innerWidth;
   const yRatio = e.clientY / window.innerHeight;
   const x = (xRatio - 0.5) * 20;
@@ -188,32 +185,21 @@ document.addEventListener('mousemove', (e) => {
   const edgeDistance = Math.min(xRatio, 1 - xRatio, yRatio, 1 - yRatio);
   const intensity = Math.max(0, 1 - edgeDistance * 5);
 
-  if (currentPage === 0) {
-    fog.style.setProperty('--x', `${xRatio * 100}%`);
-    fog.style.setProperty('--y', `${yRatio * 100}%`);
-    fog.style.setProperty('--intensity', intensity.toFixed(2));
-    fog.style.opacity = intensity > 0.1 ? 1 : 0;
-
-    if (intensity > 0.1) {
-      // 白點隨白霧閃爍
-      startBlinking();
-      stopSnow();
-    } else {
-      stopBlinking();
-      startSnow();
-    }
-  } else {
-    fog.style.opacity = 0;
-    stopSnow();
-    stopBlinking();
-  }
+  fog.style.setProperty('--x', `${xRatio * 100}%`);
+  fog.style.setProperty('--y', `${yRatio * 100}%`);
+  fog.style.setProperty('--intensity', intensity.toFixed(2));
+  fog.style.opacity = intensity > 0.1 ? 1 : 0;
 });
 
+const pages = document.querySelectorAll('.page');
+let currentPage = 0;
+let isScrolling = false;
+
 function showPage(index) {
-  if (index < 0 || index >= document.querySelectorAll('.page').length || isScrolling) return;
+  if (index < 0 || index >= pages.length || isScrolling) return;
   isScrolling = true;
-  document.querySelectorAll('.page')[currentPage].classList.remove('active');
-  document.querySelectorAll('.page')[index].classList.add('active');
+  pages[currentPage].classList.remove('active');
+  pages[index].classList.add('active');
   currentPage = index;
 
   if (currentPage === 0) {
