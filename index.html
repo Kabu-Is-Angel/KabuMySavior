@@ -118,6 +118,33 @@
     color: #ccc;
     text-shadow: 0 0 10px #aaa;
   }
+
+  /* 新增左側選單樣式 */
+  #storyMenu {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 2;
+  }
+
+  .storyBtn {
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-family: monospace;
+  }
+
+  .storyBtn:hover {
+    background: rgba(255,255,255,0.3);
+  }
 </style>
 </head>
 <body>
@@ -128,9 +155,16 @@
   <h1>🌙 歡迎來到 Kabu 的小世界</h1>
   <p>白白的...</p>
 </div>
-<div class="page">
+<div class="page" id="page2">
   <h1>🌸 第二頁</h1>
-  <p>回家了, 宇宙... ✦</p>
+  <div id="storyMenu">
+    <button class="storyBtn" data-prefix="c2">c2</button>
+    <button class="storyBtn" data-prefix="uo01">uo01</button>
+    <button class="storyBtn" data-prefix="tuj">tuj</button>
+    <button class="storyBtn" data-prefix="h424">h424</button>
+    <button class="storyBtn" data-prefix="n0">n0</button>
+  </div>
+  <p id="storyContent">回家了, 宇宙... ✦</p>
 </div>
 <div class="page">
   <h1>🌌 第三頁</h1>
@@ -178,7 +212,6 @@ function stopSnow() {
 function updateDots(intensity) {
   dots.forEach(dot => {
     if (intensity > 0.1) {
-      // 隨機閃爍透明度
       dot.style.opacity = Math.random() * intensity;
       const moveX = (Math.random() - 0.5) * 10 * intensity;
       const moveY = (Math.random() - 0.5) * 10 * intensity;
@@ -207,7 +240,6 @@ document.addEventListener('mousemove', (e) => {
   fog.style.setProperty('--intensity', intensity.toFixed(2));
   fog.style.opacity = intensity > 0.1 ? 1 : 0;
 
-  // 控制白點閃爍和出現
   clearInterval(dotInterval);
   if (intensity > 0.1) {
     updateDots(intensity);
@@ -243,7 +275,7 @@ function showPage(index) {
     fog.style.display = 'none';
     stopSnow();
   }
-
+  
   setTimeout(() => isScrolling = false, 1000);
 }
 
