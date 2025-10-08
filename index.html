@@ -21,6 +21,7 @@
   body {
     perspective: 1000px;
     background-color: #000;
+    transition: background 1s ease;
   }
 
   #background {
@@ -38,17 +39,6 @@
     z-index: -3;
   }
 
-  #background-transition {
-    position: fixed;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #333;
-    transition: top 1s ease;
-    z-index: -2;
-  }
-
   #fog {
     position: fixed;
     top: 0;
@@ -59,7 +49,7 @@
     background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,var(--intensity,0.2)), rgba(255,255,255,0) 60%);
     opacity: 0;
     transition: opacity 0.3s ease-out;
-    z-index: -1;
+    z-index: -2;
   }
 
   .dot {
@@ -68,8 +58,8 @@
     height: 3px;
     background: rgba(255,255,255,0.5);
     border-radius: 50%;
-    opacity: 0.8;
-    transition: transform 0.3s ease-out;
+    opacity: 0;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
   }
 
   .snowflake {
@@ -83,8 +73,14 @@
   }
 
   @keyframes fall {
-    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(110vh) rotate(360deg);
+      opacity: 0;
+    }
   }
 
   .page {
@@ -126,7 +122,6 @@
 </head>
 <body>
 <div id="background"></div>
-<div id="background-transition"></div>
 <div id="fog"></div>
 
 <div class="page active">
@@ -144,14 +139,11 @@
 
 <script>
 const bg = document.getElementById('background');
-const bgTransition = document.getElementById('background-transition');
 const fog = document.getElementById('fog');
-const pages = document.querySelectorAll('.page');
-let currentPage = 0;
-let isScrolling = false;
-
-// 白點效果
 const dots = [];
+let snowEnabled = true;
+let snowInterval;
+
 for (let i = 0; i < 30; i++) {
   const dot = document.createElement('div');
   dot.classList.add('dot');
@@ -161,30 +153,27 @@ for (let i = 0; i < 30; i++) {
   dots.push(dot);
 }
 
-// 白霧和雪花效果
-let snowInterval;
-function startEffects() {
-  // 只在第一頁顯示白霧和雪花
-  if (currentPage !== 0) return;
-  fog.style.display = 'block';
-  snowInterval = setInterval(() => {
-    const snowflake = document.createElement('div');
-    snowflake.classList.add('snowflake');
-    snowflake.textContent = '❄';
-    snowflake.style.left = Math.random() * window.innerWidth + 'px';
-    snowflake.style.fontSize = 8 + Math.random() * 8 + 'px';
-    snowflake.style.animationDuration = 4 + Math.random() * 3 + 's';
-    document.body.appendChild(snowflake);
-    setTimeout(() => snowflake.remove(), 8000);
-  }, 300);
+function createSnowflake() {
+  if (!snowEnabled) return;
+  const snowflake = document.createElement('div');
+  snowflake.classList.add('snowflake');
+  snowflake.textContent = '❄';
+  snowflake.style.left = Math.random() * window.innerWidth + 'px';
+  snowflake.style.fontSize = 8 + Math.random() * 8 + 'px';
+  snowflake.style.animationDuration = 4 + Math.random() * 3 + 's';
+  document.body.appendChild(snowflake);
+  setTimeout(() => snowflake.remove(), 8000);
 }
 
-function stopEffects() {
-  fog.style.display = 'none';
+function startSnow() {
+  snowEnabled = true;
+  snowInterval = setInterval(createSnowflake, 300);
+}
+function stopSnow() {
+  snowEnabled = false;
   clearInterval(snowInterval);
 }
 
-// 滑鼠移動背景與白霧
 document.addEventListener('mousemove', (e) => {
   if (currentPage !== 0) return;
   const xRatio = e.clientX / window.innerWidth;
@@ -202,35 +191,38 @@ document.addEventListener('mousemove', (e) => {
   fog.style.opacity = intensity > 0.1 ? 1 : 0;
 });
 
+const pages = document.querySelectorAll('.page');
+let currentPage = 0;
+let isScrolling = false;
+
 function showPage(index) {
   if (index < 0 || index >= pages.length || isScrolling) return;
   isScrolling = true;
   pages[currentPage].classList.remove('active');
   pages[index].classList.add('active');
+  currentPage = index;
 
-  // 第一頁
-  if (index === 0) {
-    bgTransition.style.top = '100%';
+  if (currentPage === 0) {
+    bg.style.transition = 'transform 0.1s ease-out, opacity 1s ease, background-image 1s ease, background-color 1s ease';
     bg.style.background = "url('background.jpg') no-repeat center center";
     bg.style.backgroundSize = 'cover';
-    startEffects();
-  }
-  // 第二頁
-  else if (index === 1) {
-    bgTransition.style.top = '100%';
+    fog.style.display = 'block';
+    startSnow();
+  } else if (currentPage === 1) {
+    bg.style.transition = 'transform 0.1s ease-out, opacity 1s ease, background-image 1.5s ease, background-color 1.5s ease';
     bg.style.background = "url('second_page.jpg') no-repeat center center";
     bg.style.backgroundSize = 'cover';
-    stopEffects();
+    fog.style.display = 'none';
+    stopSnow();
     bg.style.transform = 'translate(-50%, -50%) rotateX(0deg) rotateY(0deg)';
-  }
-  // 第三頁
-  else if (index === 2) {
-    bgTransition.style.top = '0%';
-    stopEffects();
+  } else if (currentPage === 2) {
+    bg.style.transition = 'transform 0.1s ease-out, opacity 1s ease, background-image 1.5s ease, background-color 1.5s ease';
+    bg.style.background = '#333';
+    fog.style.display = 'none';
+    stopSnow();
     bg.style.transform = 'translate(-50%, -50%) rotateX(0deg) rotateY(0deg)';
   }
 
-  currentPage = index;
   setTimeout(() => isScrolling = false, 1000);
 }
 
@@ -239,8 +231,7 @@ window.addEventListener('wheel', (e) => {
   else if (e.deltaY < 0) showPage(currentPage - 1);
 });
 
-// 初始啟動效果
-startEffects();
+startSnow();
 </script>
 </body>
 </html>
