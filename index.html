@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kabu 的小世界</title>
-
-<link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
-<meta name="theme-color" content="#000000">
-
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kabu 的小世界</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <meta name="theme-color" content="#000000">
+  <style>
   html, body {
     margin: 0;
     padding: 0;
@@ -119,7 +117,7 @@
     text-shadow: 0 0 10px #aaa;
   }
 
-  /* 新增左側選單樣式 */
+  /* 新增左側選單樣式 - 白底堆疊效果 */
   #storyMenu {
     position: absolute;
     top: 50%;
@@ -127,30 +125,84 @@
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 0;
     z-index: 2;
   }
 
+  #storyMenu:hover .storyBtn {
+    transform: translateY(0);
+  }
+
   .storyBtn {
-    padding: 8px 12px;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    border: 1px solid #fff;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    border: 1px solid rgba(200, 200, 200, 0.5);
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: all 0.3s ease;
     font-family: monospace;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    position: relative;
+  }
+
+  .storyBtn:nth-child(1) {
+    transform: translateY(0);
+    z-index: 5;
+  }
+
+  .storyBtn:nth-child(2) {
+    transform: translateY(-32px);
+    z-index: 4;
+  }
+
+  .storyBtn:nth-child(3) {
+    transform: translateY(-64px);
+    z-index: 3;
+  }
+
+  .storyBtn:nth-child(4) {
+    transform: translateY(-96px);
+    z-index: 2;
+  }
+
+  .storyBtn:nth-child(5) {
+    transform: translateY(-128px);
+    z-index: 1;
+  }
+
+  #storyMenu:hover .storyBtn:nth-child(1) {
+    transform: translateY(0);
+  }
+
+  #storyMenu:hover .storyBtn:nth-child(2) {
+    transform: translateY(52px);
+  }
+
+  #storyMenu:hover .storyBtn:nth-child(3) {
+    transform: translateY(104px);
+  }
+
+  #storyMenu:hover .storyBtn:nth-child(4) {
+    transform: translateY(156px);
+  }
+
+  #storyMenu:hover .storyBtn:nth-child(5) {
+    transform: translateY(208px);
   }
 
   .storyBtn:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.05) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   }
-</style>
+
+  </style>
 </head>
 <body>
 <div id="background"></div>
 <div id="fog"></div>
-
 <div class="page active">
   <h1>🌙 歡迎來到 Kabu 的小世界</h1>
   <p>白白的...</p>
