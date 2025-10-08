@@ -59,7 +59,7 @@
     background: rgba(255,255,255,0.5);
     border-radius: 50%;
     opacity: 0;
-    transition: opacity 0.2s ease-out;
+    transition: opacity 0.1s ease-out;
   }
 
   .snowflake {
@@ -137,6 +137,7 @@ const fog = document.getElementById('fog');
 const dots = [];
 let snowEnabled = true;
 let snowInterval;
+let blinkInterval;
 let currentPage = 0;
 let isScrolling = false;
 
@@ -157,20 +158,24 @@ function createSnowflake() {
   snowflake.textContent = '❄';
   snowflake.style.left = Math.random() * window.innerWidth + 'px';
   snowflake.style.fontSize = 8 + Math.random() * 8 + 'px';
-  snowflake.style.animationDuration = 5 + Math.random() * 5 + 's';
+  snowflake.style.animationDuration = 6 + Math.random() * 4 + 's';
   document.body.appendChild(snowflake);
-  setTimeout(() => snowflake.remove(), 10000);
+  setTimeout(() => snowflake.remove(), 12000);
 }
 
-function startSnow() { snowEnabled = true; snowInterval = setInterval(createSnowflake, 800); }
+function startSnow() { snowEnabled = true; snowInterval = setInterval(createSnowflake, 1200); }
 function stopSnow() { snowEnabled = false; clearInterval(snowInterval); }
 
 // 白點閃爍效果
 function blinkDots() {
   dots.forEach(dot => {
-    dot.style.opacity = Math.random() * 0.6 + 0.2;
+    dot.style.opacity = Math.random() > 0.5 ? 1 : 0;
   });
 }
+
+// 控制白點閃爍
+function startBlinking() { blinkInterval = setInterval(blinkDots, 300); }
+function stopBlinking() { clearInterval(blinkInterval); dots.forEach(dot => dot.style.opacity = 0); }
 
 // 滑鼠移動控制白霧、白點和雪花
 document.addEventListener('mousemove', (e) => {
@@ -191,16 +196,16 @@ document.addEventListener('mousemove', (e) => {
 
     if (intensity > 0.1) {
       // 白點隨白霧閃爍
-      blinkDots();
+      startBlinking();
       stopSnow();
     } else {
-      dots.forEach(dot => dot.style.opacity = 0);
+      stopBlinking();
       startSnow();
     }
   } else {
     fog.style.opacity = 0;
     stopSnow();
-    dots.forEach(dot => dot.style.opacity = 0);
+    stopBlinking();
   }
 });
 
